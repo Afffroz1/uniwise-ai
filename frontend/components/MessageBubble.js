@@ -1,12 +1,13 @@
 // components/MessageBubble.js
 import ReactMarkdown from 'react-markdown';
 
-const INTENT_LABELS = {
-  GENERAL_RULE: { label: 'General Rule', color: 'bg-blue-100 text-blue-700', icon: '📋' },
-  COURSE_REGISTRATION: { label: 'Course Registration', color: 'bg-purple-100 text-purple-700', icon: '📚' },
-  ATTENDANCE: { label: 'Attendance', color: 'bg-yellow-100 text-yellow-700', icon: '📊' },
-  FEE: { label: 'Fee Query', color: 'bg-orange-100 text-orange-700', icon: '💳' },
-  ESCALATION: { label: 'Escalated', color: 'bg-red-100 text-red-700', icon: '🎫' },
+const INTENT_CONFIG = {
+  GENERAL_RULE: { label: 'University Rule', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+  COURSE_REGISTRATION: { label: 'Course Advisory', color: 'bg-teal-50 text-teal-800 border-teal-200' },
+  ATTENDANCE: { label: 'Attendance Rule', color: 'bg-slate-100 text-slate-800 border-slate-300' },
+  FEE: { label: 'Fee Regulation', color: 'bg-amber-50 text-amber-800 border-amber-200' },
+  STUDENT_PROFILE: { label: 'Student Record', color: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+  ESCALATION: { label: 'Support Ticket', color: 'bg-rose-50 text-rose-800 border-rose-200' },
 };
 
 export default function MessageBubble({ message }) {
@@ -15,9 +16,9 @@ export default function MessageBubble({ message }) {
   if (isUser) {
     return (
       <div className="flex justify-end message-enter">
-        <div className="max-w-[75%] bg-amu-green text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
-          <p className="text-sm">{message.content}</p>
-          <p className="text-xs text-white/60 mt-1 text-right">{message.time}</p>
+        <div className="max-w-[75%] bg-amu-primary text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm text-sm">
+          <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
+          <span className="block text-[11px] text-white/60 mt-1 text-right">{message.time}</span>
         </div>
       </div>
     );
@@ -25,46 +26,44 @@ export default function MessageBubble({ message }) {
 
   // Assistant message
   const meta = message.metadata;
-  const intentInfo = meta?.intent ? INTENT_LABELS[meta.intent] : null;
+  const intentInfo = meta?.intent ? INTENT_CONFIG[meta.intent] || { label: 'Academic Advisory', color: 'bg-gray-100 text-gray-700 border-gray-200' } : null;
 
   return (
     <div className="flex justify-start message-enter">
-      <div className="max-w-[85%] space-y-2">
-        {/* Bot avatar + header */}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-amu-green rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
-            U
-          </div>
-          <span className="text-xs font-semibold text-amu-green">UniWise AI</span>
+      <div className="max-w-[85%] space-y-1.5">
+        
+        {/* Header tag */}
+        <div className="flex items-center gap-2 px-1">
+          <span className="text-xs font-semibold text-amu-primary tracking-wide">UniWise AI</span>
           {intentInfo && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${intentInfo.color}`}>
-              {intentInfo.icon} {intentInfo.label}
+            <span className={`text-[10px] font-medium px-2 py-0.5 rounded border ${intentInfo.color}`}>
+              {intentInfo.label}
             </span>
           )}
           {meta?.confidence && (
-            <span className="text-xs text-gray-400">
-              {Math.round(meta.confidence * 100)}% confidence
+            <span className="text-[11px] text-gray-400">
+              {Math.round(meta.confidence * 100)}% verified
             </span>
           )}
         </div>
 
-        {/* Message body */}
-        <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100">
-          <div className="prose prose-sm max-w-none text-gray-800 prose-headings:text-amu-green prose-strong:text-gray-900">
+        {/* Bubble */}
+        <div className="bg-white rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-amu-border/70 text-gray-800">
+          <div className="prose prose-sm max-w-none text-gray-800 prose-headings:text-amu-primary prose-headings:font-semibold prose-strong:text-gray-900 prose-strong:font-semibold leading-relaxed">
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
 
-          {/* Citations */}
+          {/* Citations section (clean & minimal) */}
           {meta?.citations && meta.citations.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">📄 Sources</p>
+            <div className="mt-4 pt-3 border-t border-gray-100 space-y-1.5">
+              <p className="text-[11px] font-semibold text-gray-400 tracking-wider uppercase">Sources & References</p>
               <div className="space-y-1">
                 {meta.citations.map((c, i) => (
-                  <div key={c.chunk_id} className="flex gap-2 text-xs text-gray-600 bg-amu-light rounded px-2 py-1.5">
-                    <span className="font-bold text-amu-green shrink-0">[{i + 1}]</span>
-                    <div>
-                      <span className="font-semibold">{c.source}</span>
-                      <span className="text-gray-500"> — {c.text}</span>
+                  <div key={i} className="flex gap-2 text-xs text-gray-600 bg-amu-light/60 border border-amu-border/50 rounded-lg p-2">
+                    <span className="font-mono text-amu-primary font-bold shrink-0">[{i + 1}]</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-900 truncate">{c.source}</p>
+                      {c.text && <p className="text-gray-500 text-[11px] mt-0.5 line-clamp-2">{c.text}</p>}
                     </div>
                   </div>
                 ))}
@@ -72,17 +71,18 @@ export default function MessageBubble({ message }) {
             </div>
           )}
 
-          {/* Ticket raised badge */}
+          {/* Ticket notification */}
           {meta?.ticket_raised && meta?.ticket_id && (
-            <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
-              <p className="text-xs font-semibold text-orange-700">🎫 Support Ticket Raised</p>
-              <p className="text-xs text-orange-600 font-mono mt-0.5">{meta.ticket_id}</p>
-              <p className="text-xs text-orange-500 mt-0.5">Expected resolution: within 7 working days</p>
+            <div className="mt-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-xs">
+              <p className="font-semibold">Support Ticket Created: {meta.ticket_id}</p>
+              <p className="text-amber-800 text-[11px] mt-0.5">
+                Your inquiry has been escalated to the department cell. Expected response within 7 working days.
+              </p>
             </div>
           )}
         </div>
 
-        <p className="text-xs text-gray-400 ml-9">{message.time}</p>
+        <span className="block text-[11px] text-gray-400 px-1">{message.time}</span>
       </div>
     </div>
   );

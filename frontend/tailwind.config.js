@@ -8,14 +8,22 @@ module.exports = {
     extend: {
       colors: {
         amu: {
-          green: '#006633',
-          gold: '#B8860B',
-          light: '#E8F5E9',
-          dark: '#004D26',
+          primary: '#0b5e36',
+          dark: '#073d22',
+          darker: '#042817',
+          light: '#eaf3ed',
+          sage: '#e3ede6',
+          sageDark: '#d0dfd6',
+          maroon: '#8c1d22',
+          gold: '#c29b38',
+          border: '#dbe6df',
+          sidebar: '#083b21',
+          sidebarActive: '#0f5230',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        serif: ['Cinzel', 'Georgia', 'serif'],
       },
     },
   },
