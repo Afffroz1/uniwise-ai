@@ -1,17 +1,5 @@
+# Frontend only on Render. The FastAPI backend is deployed separately on Vercel (backend/vercel.json).
 services:
-  # ---------------- BACKEND SERVICE ----------------
-  - type: web
-    name: uniwise-backend
-    runtime: python
-    rootDir: backend
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: GEMINI_API_KEY
-        sync: false
-
-  # ---------------- FRONTEND SERVICE ----------------
   - type: web
     name: uniwise-frontend
     runtime: node
@@ -20,8 +8,7 @@ services:
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
+      # Set in the Render dashboard to your Vercel backend URL, e.g. https://uniwise-backend.vercel.app
+      # (include https://, no trailing slash). Must be set BEFORE the build - Next.js bakes it in.
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: uniwise-backend
-          property: host
+        sync: false

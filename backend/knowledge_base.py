@@ -183,18 +183,34 @@ SEED_CHUNKS = [
 
 
 def _load_custom_chunks() -> list[dict]:
-    if os.path.exists(DATA_FILE):
-        try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return []
+    if _MEMORY_CHUNKS:
+        return list(_MEMORY_CHUNKS)
+    for path in (_TMP_FILE, DATA_FILE):
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                continue
     return []
 
 
+_TMP_FILE = os.path.join("/tmp", "knowledge_base_custom.json")
+_MEMORY_CHUNKS: list[dict] = []   # last-resort store when no filesystem is writable
+
+
 def _save_custom_chunks(chunks: list[dict]):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(chunks, f, indent=2, ensure_ascii=False)
+    """Persist uploaded chunks. On read-only hosts (e.g. Vercel) fall back to /tmp, then memory.
+    Note: /tmp and memory are temporary on serverless - uploads may disappear on cold start."""
+    global _MEMORY_CHUNKS
+    _MEMORY_CHUNKS = list(chunks)
+    for path in (DATA_FILE, _TMP_FILE):
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(chunks, f, indent=2, ensure_ascii=False)
+            return
+        except OSError:
+            continue
 
 
 def get_all_chunks() -> list[dict]:
