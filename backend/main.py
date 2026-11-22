@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import (
@@ -50,10 +52,10 @@ app.add_middleware(
 SESSIONS: dict[str, str] = {}
 
 
-@app.get("/")
-def root():
+@app.get("/api/status")
+def api_status():
     return {
-        "message": "UniWise AI is running 🎓",
+        "message": "UniWise AI is running",
         "version": "1.1.0",
         "gemini_active": bool(get_gemini_api_key()),
     }
@@ -258,6 +260,47 @@ def set_api_key(req: ApiKeyRequest):
     except Exception:
         pass
     return {"success": True, "configured": bool(k), "message": "Gemini API Key updated successfully."}
+
+
+# ---- Static Files & Frontend Serving (Single unified app) ----
+frontend_out = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend", "out")
+
+if os.path.exists(frontend_out):
+    next_static = os.path.join(frontend_out, "_next")
+    if os.path.exists(next_static):
+        app.mount("/_next", StaticFiles(directory=next_static), name="next_static")
+
+    @app.get("/amu-logo.png")
+    def serve_logo():
+        logo_path = os.path.join(frontend_out, "amu-logo.png")
+        if os.path.isfile(logo_path):
+            return FileResponse(logo_path)
+        raise HTTPException(status_code=404, detail="Logo not found")
+
+    @app.get("/chat")
+    def serve_chat_page():
+        return FileResponse(os.path.join(frontend_out, "chat.html"))
+
+    @app.get("/")
+    def serve_index_page():
+        return FileResponse(os.path.join(frontend_out, "index.html"))
+
+    @app.get("/{full_path:path}")
+    def serve_static_or_fallback(full_path: str):
+        # Don't intercept API paths
+        api_prefixes = ("auth/", "chat", "documents", "settings/", "student/", "tickets", "search/", "api/", "health")
+        if full_path.startswith(api_prefixes):
+            raise HTTPException(status_code=404, detail="Not Found")
+        target_file = os.path.join(frontend_out, full_path)
+        if os.path.isfile(target_file):
+            return FileResponse(target_file)
+        if os.path.isfile(target_file + ".html"):
+            return FileResponse(target_file + ".html")
+        return FileResponse(os.path.join(frontend_out, "index.html"))
+else:
+    @app.get("/")
+    def serve_fallback_info():
+        return {"message": "UniWise AI Backend Running. Frontend build not detected in frontend/out.", "version": "1.1.0"}
 
 
 if __name__ == "__main__":

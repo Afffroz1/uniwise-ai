@@ -24,7 +24,7 @@ import MessageBubble from '../components/MessageBubble';
 import DocumentUploadModal from '../components/DocumentUploadModal';
 import SettingsModal from '../components/SettingsModal';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API = process.env.NEXT_PUBLIC_API_URL || '';
 
 function getTime() {
   return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });

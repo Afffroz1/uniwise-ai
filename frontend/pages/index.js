@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Image from 'next/image';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API = process.env.NEXT_PUBLIC_API_URL || '';
 
 const DEMO_USERS = [
   { name: 'Afroz Alam', faculty_no: '25CAMSA170', password: 'password123', label: 'Student · MCA Sem 3', role: 'student' },

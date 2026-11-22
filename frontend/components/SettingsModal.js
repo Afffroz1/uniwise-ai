@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Key, CheckCircle, AlertCircle } from 'lucide-react';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function SettingsModal({ isOpen, onClose, onApiKeyUpdated }) {
   const [apiKey, setApiKey] = useState('');

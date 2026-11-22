@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Upload, FileText, Globe, ListFilter, X, Trash2 } from 'lucide-react';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function DocumentUploadModal({ isOpen, onClose, onDocumentAdded }) {
   const [tab, setTab] = useState('pdf');
