@@ -1,8 +1,16 @@
 """
 UniWise AI — FastAPI Backend
-Run: python main.py
+Run: python main.py or uvicorn backend.main:app
 """
 import os
+import sys
+from pathlib import Path
+
+# Ensure backend directory is in sys.path regardless of execution directory (repo root or backend/)
+BACKEND_DIR = Path(__file__).resolve().parent
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
+
 import uuid
 from typing import Optional
 from dotenv import load_dotenv
